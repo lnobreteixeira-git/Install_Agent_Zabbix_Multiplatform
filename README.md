@@ -24,5 +24,9 @@
    
    b) Abaixo da tag de grupo exemplo [LINUX], coloque a lista de servidores linux um em cada linha se seu computador resolve nomes via DNS local pode ser o hostname caso contrário o endereço IP.
    
-   c) Edite o arquivo ansible.cfg se achar conveniente, ele já está preparado para comunicação com Linux, AIX e Linux.
+   c) Edite o arquivo ansible.cfg se achar conveniente, ele já está preparado para comunicação com Linux, AIX e Linux, porém é necessário configurar o usuário de dominio do windows e e sua respectiva senha:
+   
+         - ansible_user         = usuario@dominio_windows
+   
+         - ansible_password     = senha_usuario_dominio_windows
    
