@@ -1,0 +1,28 @@
+---
+#- name: Servidores CentOS
+#  hosts: 
+#    - CentOS
+#
+#  roles:
+#    - zabbix_centos
+
+#- name: Servidores Debian
+#  hosts: 
+#    - Debian 
+#
+#  roles:
+#    - zabbix_debian
+
+#- name: Servidores AIX 7.X
+#  hosts: 
+#    - AIX_71 
+#
+#  roles:
+#    - zabbix_aix_7
+
+- name: Servidores Windows
+  hosts: 
+    - WINDOWS
+
+  roles:
+    - zabbix_windows

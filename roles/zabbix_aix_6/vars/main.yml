@@ -1,0 +1,2 @@
+    zabbix_user: zabbix
+    zabbix_password: "{{ lookup('password', '/etc/ansible/password chars=ascii_letters') }}"

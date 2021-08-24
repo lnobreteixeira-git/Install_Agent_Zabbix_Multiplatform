@@ -1,0 +1,16 @@
+[CentOS]
+Server1
+Server2
+Server3
+
+[Debian]
+Server4
+Server5
+Server6
+
+[AIX_71]
+Server7
+Server8
+
+[WINDOWS]
+Server13

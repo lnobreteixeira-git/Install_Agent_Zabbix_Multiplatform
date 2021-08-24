@@ -1,0 +1,63 @@
+
+- yum:
+    name: zabbix-agent
+    state: removed
+
+
+- command: userdel -r zabbix
+
+
+- command: rm -fr /tmp/zabbix
+
+
+- name: Criar um usuario zabbix no grupo wheel
+  user:
+     name: "{{ zabbix_user }}"
+     uid: 20000
+     group: wheel
+     shell: /bin/bash
+     append: yes
+     createhome: yes
+     comment: 'User zabbix Created with ansible'
+     password: "{{ zabbix_password | password_hash('sha512') }}"
+  register: user_created
+
+
+- command: mkdir /tmp/zabbix
+
+
+- copy: 
+    src: zabbix-agent-5.0.14-1.el7.x86_64.rpm
+    dest: /tmp/zabbix
+    owner: zabbix
+    group: wheel
+    mode: 0777
+    backup: yes
+  ignore_errors: true
+
+
+- yum:
+    name: /tmp/zabbix/zabbix-agent-5.0.14-1.el7.x86_64.rpm
+    state: installed
+
+
+- copy: 
+    src:  zabbix_agentd.conf
+    dest: /etc/zabbix
+    owner: zabbix
+    group: wheel
+    mode: 0755
+    backup: yes
+  ignore_errors: true
+
+
+
+#- ansible.builtin.service:
+#    name: zabbix-agent
+#    state: started
+
+- service:
+    name: zabbix-agent
+    state: started
+    enabled: yes
+

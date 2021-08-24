@@ -1,0 +1,14 @@
+#!/bin/sh
+clear
+OPCAO=$1
+case "$OPCAO" in
+"start") /usr/sbin/zabbix_agentd -c /etc/zabbix/zabbix_agentd.conf
+;;
+"stop") kill -9 `ps -ef |grep zabbix_agentd| grep -v grep |awk '{ print $2 }'`
+;;
+"status") ps -ef |grep zabbix_agentd
+;;
+*) echo "Erro: sintaxe zabbixctl {start, stop, status}"
+   echo ""
+;;
+esac

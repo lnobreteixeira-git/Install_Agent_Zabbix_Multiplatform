@@ -1,0 +1,154 @@
+#    name: zabbix-agent
+
+
+- name: Removendo o agente zabbix
+  command: rm -fr /usr/sbin/zabbix* /usr/bin/zabbix*
+  ignore_errors: true
+
+
+- name: Removendo usuario zabbix
+  command: userdel -r zabbix
+  ignore_errors: true
+
+
+- name: Removendo diretorios /tmp/zabbix 
+  command: rm -fr /tmp/zabbix
+  ignore_errors: true
+
+
+- name: Removendo diretorios /etc/zabbix
+  command: rm -fr /etc/zabbix
+  ignore_errors: true
+
+
+- name: Criar um usuario zabbix no grupo staff
+  user:
+     name: "{{ zabbix_user }}"
+     uid: 20000
+     group: staff
+     shell: /bin/bash
+     append: yes
+     createhome: yes
+     comment: 'User zabbix Created with ansible'
+     password: "{{ zabbix_password | password_hash('sha512') }}"
+  register: user_created
+  ignore_errors: true
+
+
+- name: Criando diretorios /tmp/zabbix 
+  command: mkdir -p /tmp/zabbix
+  ignore_errors: true
+
+
+
+- name: Privilegio /tmp/zabbix 
+  command: chmod -R 777 /tmp/zabbix
+  ignore_errors: true
+
+
+
+- name: Criando diretorios /etc/zabbix
+  command: mkdir -p /etc/zabbix
+  ignore_errors: true
+
+
+- name: Criando diretorios /etc/zabbix/zabbix_agentd.d
+  command: mkdir -p /etc/zabbix/zabbix_agentd.d
+  ignore_errors: true
+
+
+
+- name: Criando diretorios /var/log/zabbix
+  command: mkdir -p /var/log/zabbix
+  ignore_errors: true
+
+
+- name: Privilegio 777 /var/log/zabbix
+  command: chmod -R 777 /var/log/zabbix
+  ignore_errors: true
+
+
+- name: Criando diretorios /var/run/zabbix
+  command: mkdir -p /var/run/zabbix
+  ignore_errors: true
+
+
+- name: Privilegio 777 /etc/zabbix
+  command: chmod -R 777 /var/run/zabbix
+  ignore_errors: true
+
+
+
+- name: Privilegio 775 /var/log/zabbix /etc/zabbix/zabbix_agentd.d
+  command: chmod -R 775 /var/log/zabbix /etc/zabbix/zabbix_agentd.d
+  ignore_errors: true
+
+
+- name: Copiando o pacote de instalacao do agente zabbix para AIX 7.1 e AIX 7.2
+  copy: 
+    src: zabbix_agent-5.0.14-aix-7.1-powerpc.tar.gz
+    dest: /tmp/zabbix
+    owner: zabbix
+    group: staff
+    mode: 0777
+    backup: yes
+  ignore_errors: true
+
+
+- name: Descompactando o agente zabbix .gz
+  command: gzip -d /tmp/zabbix/zabbix_agent-5.0.14-aix-7.1-powerpc.tar.gz
+
+
+- name: Descompactando o agente zabbix .tar
+  command: tar -xvpf /tmp/zabbix/zabbix_agent-5.0.14-aix-7.1-powerpc.tar -C /tmp/zabbix
+
+
+- name: Copiando o arquivo de configuracao do zabbix para pasta /etc/zabbix
+  copy: 
+    src:  zabbix_agentd.conf
+    dest: /etc/zabbix/
+    owner: zabbix
+    group: staff
+    mode: 0755
+    backup: yes
+  ignore_errors: true
+
+
+- name: Configurando parte 1
+  command: chmod -R 755 /etc/zabbix
+  ignore_errors: true
+
+- name: Configurando parte 2
+  command: chown -R zabbix:staff  /etc/zabbix
+  ignore_errors: true
+
+
+- name: Configurando parte 3
+  command: mkdir -p /tmp/zabbix/bin ; chown zabbix:staff  /tmp/zabbix/bin/*
+  ignore_errors: true
+
+- name: Configurando parte 4
+  command: mkdir -p /tmp/zabbix/sbin ; chown zabbix:staff  /tmp/zabbix/sbin/*
+  ignore_errors: true
+
+- name: Configurando parte 7
+  command: chmod -R 755 /tmp/zabbix/bin
+  ignore_errors: true
+
+- name: Configurando parte 8
+  command: cp -rpf /tmp/zabbix/bin/* /usr/bin
+  ignore_errors: true
+
+- name: Configurando parte 9
+  command: chmod -R 755 /tmp/zabbix/sbin
+  ignore_errors: true
+
+- name: Configurando parte 10
+  command: cp -rpf /tmp/zabbix/sbin/* /usr/sbin
+  ignore_errors: true
+
+
+- name: Subindo o servico e configurando-o para start no boot
+  command: /usr/sbin/zabbix_agentd -c /etc/zabbix/zabbix_agentd.conf
+  ignore_errors: true
+

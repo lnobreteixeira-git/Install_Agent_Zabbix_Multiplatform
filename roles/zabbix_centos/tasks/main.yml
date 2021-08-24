@@ -1,0 +1,67 @@
+#    name: zabbix-agent
+
+- name: Removendo o agente zabbix
+  yum:
+    name: zabbix-agent
+    state: removed
+
+
+- name: Removendo usuario zabbix
+  command: userdel -r zabbix
+
+
+- name: Removendo diretorio /tmp/zabbix
+  command: rm -fr /tmp/zabbix
+
+
+- name: Criar um usuario zabbix no grupo wheel
+  user:
+     name: "{{ zabbix_user }}"
+     uid: 20000
+     group: wheel
+     shell: /bin/bash
+     append: yes
+     createhome: yes
+     comment: 'User zabbix Created with ansible'
+     password: "{{ zabbix_password | password_hash('sha512') }}"
+  register: user_created
+
+
+- name: Criando diretorio /tmp/zabbix
+  command: mkdir /tmp/zabbix
+
+
+- name: Copiando o pacote de instalacao do agente zabbix para CentOS / RedHat / Fedora
+  copy: 
+    src: zabbix-agent-5.0.14-1.el7.x86_64.rpm
+    dest: /tmp/zabbix
+    owner: zabbix
+    group: wheel
+    mode: 0777
+    backup: yes
+  ignore_errors: true
+
+
+- name: Instalando o pacote do agente zabbix
+  yum:
+    name: /tmp/zabbix/zabbix-agent-5.0.14-1.el7.x86_64.rpm
+    state: installed
+
+
+- name: Copiando o arquivo de configuracao do zabbix para pasta /etc/zabbix
+  copy: 
+    src:  zabbix_agentd.conf
+    dest: /etc/zabbix
+    owner: zabbix
+    group: wheel
+    mode: 0755
+    backup: yes
+  ignore_errors: true
+
+
+- name: Subindo o servico e configurando-o para start no boot
+  service:
+    name: zabbix-agent
+    state: started
+    enabled: yes
+

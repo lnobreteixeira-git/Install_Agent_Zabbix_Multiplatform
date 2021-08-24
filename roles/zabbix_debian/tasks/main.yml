@@ -1,0 +1,64 @@
+- name: Removendo pacote do agente do zabbix
+  apt:
+    name: zabbix-agent
+    state: absent
+
+- name: Removendo usuario zabbix
+  command: userdel -r zabbix
+
+
+- name: Removendo diretorio /tmp/zabbix
+  command: rm -fr /tmp/zabbix
+
+
+- name: Criar um usuario zabbix no grupo staff
+  user:
+     name: "{{ zabbix_user }}"
+     uid: 20000
+     group: staff
+     shell: /bin/bash
+     append: yes
+     createhome: yes
+     comment: 'User zabbix Created with ansible'
+     password: "{{ zabbix_password | password_hash('sha512') }}"
+  register: user_created
+
+
+- name: Criando diretorio /tmp/zabbix
+  command: mkdir /tmp/zabbix
+
+
+- name: Copiando o pacote de instalacao do agente zabbix para debian / ubuntu
+  copy: 
+    src: zabbix-agent_5.0.14-1+focal_amd64.deb
+    dest: /tmp/zabbix
+    owner: zabbix
+    group: staff
+    mode: 0777
+    backup: yes
+  ignore_errors: true
+
+
+- name: Instalando o pacote do agente zabbix
+  apt: 
+    deb: "/tmp/zabbix/zabbix-agent_5.0.14-1+focal_amd64.deb"
+    state: present
+
+
+- name: Copiando o arquivo de configuracao do zabbix para pasta /etc/zabbix
+  copy: 
+    src:  zabbix_agentd.conf
+    dest: /etc/zabbix
+    owner: zabbix
+    group: staff
+    mode: 0755
+    backup: yes
+  ignore_errors: true
+
+
+- name: Subindo o servico e configurando-o para start no boot
+  service:
+    name: zabbix-agent
+    state: started
+    enabled: yes
+

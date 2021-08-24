@@ -1,0 +1,7 @@
+- name: Copia de arquivos
+  win_copy:
+    src: zabbix_agent-5.0.14-windows-amd64-openssl.msi
+    dest: C:\temp\zabbix_agent-5.0.14-windows-amd64-openssl.msi
+
+- name: Instalando agente Zabbix
+  win_command: msiexec.exe /i C:\temp\zabbix_agent-5.0.14-windows-amd64-openssl.msi server=192.168.15.104 sport=10050 lport=10051 HostnameItem=system.hostname ServerActive=192.168.15.104 /qn /norestart /l*v  c:\temp\install_log.txt
