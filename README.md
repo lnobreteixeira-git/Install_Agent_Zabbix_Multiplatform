@@ -29,4 +29,6 @@
          - ansible_user         = usuario@dominio_windows
    
          - ansible_password     = senha_usuario_dominio_windows
+         
+         Faça o mesmo no arquivo de nome WINDOWS dentro do diretório group_vars editando as linhas correspondentes acima.
    
