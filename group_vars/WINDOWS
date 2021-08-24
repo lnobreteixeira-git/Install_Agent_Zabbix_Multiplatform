@@ -1,5 +1,5 @@
-ansible_user: cteixeira@lab.ansible.com
-ansible_password: root.123
+ansible_user: usuario@dominio_windows
+ansible_password: senha_usuario_dominio_windows
 ansible_port: 5986
 ansible_connection: winrm  
 ansible_winrm_server_cert_validation: ignore
